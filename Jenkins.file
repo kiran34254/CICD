@@ -1,0 +1,260 @@
+def artiFactConfig = [:]  // Declare a global variable for deployment configuration
+def artiFactSaveConfig = [:]  // Declare a global variable for image saving configuration
+def guiPorjects = ['cib-mfe-workspace', 'bankCashProGUI', 'bankCashProPlus', 'chatbot-nlp-engine', 'chatbot-portal', 'chatbot-widget', 'chatbot-portal-api', 'corporate-emandate-portal', 'BotMachineService']
+def app ='\$app'
+pipeline {
+    agent any
+    environment {
+        def openshiftToken = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjJDYWUtODZXRzhWNGRSc3JMNlB1Q3dwMWtMajlvNDN5NzRZXzNFZlllMUkifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJjbXBpY3AtcHAiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiY21waWNwLXNlcnZpY2VhY2NvdW50LXRva2VuLXFtNno3Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImNtcGljcC1zZXJ2aWNlYWNjb3VudCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjhiNzAxOWI1LWIzMTQtNGU4Zi05NGI0LTJlYmM3MGYwZjdkMSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpjbXBpY3AtcHA6Y21waWNwLXNlcnZpY2VhY2NvdW50In0.PLa3P6BjbikhoCXvNrv1PrKQHVpgpRw1HOH-xTk3AM6l0wglv4jXO6L8u-JKQjfkPo-89ODtyqdsoQmhR09HlM2M_FwqpH-fU3-fklG83KUpajiNFpIGKW_Vb9CVfNXk0E7WvH7hyHhVRrRJv8I_GGj4xD0jd8JwQqayi7ymNvu4jqRrfGSWouiEOLWfMJ6ez57_gn0n57Fbdre0-u_vryF2ChhHcg-Xp4RoUa9tR3tT9hIy7s50S7OFuvN3EawMZnajuXxuC_lk-KRTrsJhLbAhkuqVTnaPEYRRAi51sBVy2q6idjL2TIIYVWcbUPqlx4RDpqiqQtyxksIMm7PoekP9Rps27e6qUEdP-CNay4d2vdXAO6vqhyxUKZzdhA2ikT68IQ1QwnEYW2ywTCXt_Iv8lYCPitiCCT6R34gLk9b8yicc_snKrXTIWV-5TrQuK80SGQAvx4cbSgH22iYvW0wrrdJrEWM3cdr6Gm_MuinqXXPFisCEzGo4a_0Lk4lQtN1mLSXMwgkqu6LY9DbpQOW4ERi2sts9Q88x0NhmVVsLpAXDM-_wpyvTkibTj3H2BslniLRGON3jwnwL9SDjmQ1AKe7wYjsp9COrqwrA7mpcG6PEZbFPqE2xqP7tpiY_JJvDGfA0_8KdQ8BuMdclIUrWCfmiDEpBbSIDXWLzQM8'
+        def openshiftToken1 = 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImFZcThRUEU0b2hndG5EMUtqb09oVlZZaFFhWkRmSThpNy1PVkFkb3YteDAifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjIl0sImV4cCI6MTc5MzQyOTcwOCwiaWF0IjoxNzYxODkzNzA4LCJpc3MiOiJodHRwczovL2t1YmVybmV0ZXMuZGVmYXVsdC5zdmMiLCJrdWJlcm5ldGVzLmlvIjp7Im5hbWVzcGFjZSI6ImNtcGljcC1kZW1vIiwic2VydmljZWFjY291bnQiOnsibmFtZSI6ImNtcGljcC1zZXJ2aWNlYWNjb3VudCIsInVpZCI6IjBhODA2YzMzLTdjYzktNDA5MC05OGNlLWU3ODI1MWUwZGE4NyJ9fSwibmJmIjoxNzYxODkzNzA4LCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6Y21waWNwLWRlbW86Y21waWNwLXNlcnZpY2VhY2NvdW50In0.fRmWOszzF5hBzw5UoTW-GsFfhaw6BWdRGJtbtaaEb7rS4k4uMal76bRg6_ZWgsS_DyHHdofS5sESYaCYBaQbXBD0tY2N7iNCPtjSQEaBVOTd6dd0-ChIQUOGGfRLWorybJRDrJEGrttBrQATIVR4UXpDFzYLmtWRdh6V2wV5oqFNlbTlvcpjRKUrCjPNCj86IwTZVh8MYYSF4LwD0lYavFf9WmnVrXf6TBF_OJddTNZ8x80NQtJUi8oWogur4RGC1P4g0C-_C-HllODw3WrueLrDqNe8UZJwTMYHTsUUzVmoMLpnptT_A_CAlsmxe7lGpA6T2nw8nqCLkb1jq6Cwe-4W7vJQGhfaFo-DcJAEijt3TEwcObZ2QPay_YlbLqrWcfU-j9yFeKAlItzefnq0tU7cV17wrDsoGK9a4CWjkIum1VBeSt693F-qgcQFkE9qn_ngKxHyfzCPHkxDo_R07v4mXmlPIbUEhePSWOKzPSIEfDqDJUbVkiPpAQxRpXMC3Jvr2ptEpgpXYqITpjZwVinLpE124G23oCfM8D1QEyrIgnCM70_XeIFq0j1X7ZcdtUJZ0BkXZ-Yf4lx55egj6hNdqfX62HxMEh7yNix_dTtpK_teLuFQFvVh6YLZwhqZ88wX9nYx6JKQJ5WlGAaOBEzWmupMjoTLA-Mh3It6d1c'
+        OPENSHIFT_SERVER = 'https://api.ocpcmpnonprod.sbi.co.in:6443'
+        //REMOTE_DIR = '/AURION_PRO/INTRAY/'
+        REMOTE_DIR = '/AURION_PRO1/OUTTRAY1/Backup1/'
+    }
+
+    stages {
+        stage('initial_cleanup') {
+            steps {
+                script {
+                    if (!params.initial_cleanup) {
+                        echo "No cleanUp & No removed build"
+                        return
+                    }
+                    sh """
+                        rm -rf /home/cmpdevops/CMP_PRE_PROD/*
+                        podman stop -a || true
+                        podman rm -a -f
+                        podman rmi -a -f
+                        podman volume prune -f
+                        podman system prune -a -f
+                    """
+                }
+            }
+        }
+        stage('GetArtifactsAndUnZip') {
+            steps {
+                script {
+                    if (!params.dateTime || !params.downLoad) {
+                        echo "No project or dateTime not mentioned, or you are not willing to download"
+                        return
+                    }
+
+                    echo "Selected projects are << $projects >>"
+                    
+                    if (!projects || projects.isEmpty()) {
+                        echo "Projects not selected: <<$projects>>"
+                    }
+                    
+                    dir(params.localDir) {
+                        def projectToDownLoad = params.dateTime + '*'
+                        sh """
+                            sshpass -p "jenkins-sftp-password" sftp -oport=2201 1023182@10.176.48.25 << EOF
+                            cd ${REMOTE_DIR}
+                            get $projectToDownLoad                        
+                            EOF
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage('Unzip File') {
+            steps {
+                script {
+                    if (!params.unZip) {
+                        echo "No Unzip"
+                        return
+                    }
+                    
+                    def prefixIndex = 14
+                    dir(params.localDir) {
+                        def zipFiles = sh(script: 'ls *.txt', returnStdout: true).trim().split("\n")
+                       
+                        zipFiles.each { file ->
+                            def exactFileName = file.substring(prefixIndex, file.length() - 4)
+                            def guiProj = guiPorjects.find { exactFileName ==~ /\b${it}\b/ }
+                            
+                            if (guiProj) {
+                                sh "mkdir -p $guiProj"
+                                sh "rm -rf $guiProj"
+                                sh "unzip -o $file -d ./$guiProj"
+                            } else {
+                                sh "unzip -o $file"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('ReadConfiguration') {
+            steps {
+                script {
+                    // Read different configurations for saving images and for deployment
+                    artiFactConfig = readJSON file: '/jenkins_data/workspace/CMP_PRE_PROD/config/config.json'
+                    artiFactSaveConfig = readJSON file: '/jenkins_data/workspace/CMP_PRE_PROD/config/configUAT.json'
+                   // artiFactSaveConfig = readJSON file: '/jenkins_data/workspace/CMP_PRE_PROD/configUAT.json'  // New JSON for saving images
+                }
+            }
+        }
+
+        stage('BuildDockerImageAndPublish') {
+            steps {
+                script {
+                    if (!params.publishToQuay || !params.imageVersion) {
+                        echo "Skipping BuildDockerImageAndPublish"
+                        return
+                    }
+
+                  
+                    sh"podman login -u='$app' -p='QWJMUCQJTJ1M05FTRJN5OH4F0N8JBAJTX0D836G0B626Q8745RMFKV06YQP3NS2IISPUFA19FAE31PF94GIYRTX33VQWEY6K1G7AIZ3NBU1DETP8GX9GVWKO' cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in --tls-verify=false"
+                    def jarsFolders = sh(script: "find ${params.localDir} -maxdepth 1 \\( -name '*.jar' -o -type d \\) | sed 's|.*/||'", returnStdout: true).trim().split('\n')
+                    
+                    jarsFolders.each { file ->
+                        def artiFactDtl = artiFactConfig[file]  // Use the deployment config
+                        if (!artiFactDtl) {
+                            echo "No mapping defined for $file"
+                            return
+                        }
+                        def dockerFile = artiFactDtl['dockerFile']
+                        def imageName = artiFactDtl['quay']
+                        def docDir = artiFactDtl['docDir']
+                        def desti = docDir ? "${params.localDir}/${file}/${docDir}" : params.localDir
+
+                        echo "dockerFile: $dockerFile"
+                        echo "imageName: $imageName"
+                        
+                        def dockerFilePath = "${params.dokConfigLocation}/${dockerFile}"
+                        
+                        sh "cp ${dockerFilePath} ${desti}"
+                        
+                        dir(desti) {
+                            sh "podman build --tls-verify=false -t cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/${imageName}:${params.imageVersion}-${currentBuild.number} -f ${dockerFile}"
+                            sh "podman push --tls-verify=false cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/${imageName}:${params.imageVersion}-${currentBuild.number}"
+                            sh "podman tag cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/${imageName}:${params.imageVersion}-${currentBuild.number} cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/${imageName}:PROD_READY"
+                            sh "podman push --tls-verify=false cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/${imageName}:PROD_READY"
+                            sh "podman rm -a -f"
+                            sh "podman rmi -a -f"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('InstallApplications') {
+            steps {
+                script {
+                    if (!params.toOpenShift || !params.imageVersion) {
+                        echo "Skipping install Application to Openshift"
+                        return
+                    }
+
+                   // echo "Config file $config.json"
+
+                    // Always use token for cmpicp-performance
+                    def token = env.openshiftToken
+
+                    sh "oc login --token=${token} --server=${env.OPENSHIFT_SERVER}"
+
+                    dir(params.localDir) {
+                        def jarsFolders = sh(script: "find ${params.localDir} -maxdepth 1 \\( -name '*.jar' -o -type d \\) | sed 's|.*/||'", returnStdout: true).trim().split('\n')
+                        echo "Files are $jarsFolders"
+                        
+                        jarsFolders.each { file ->
+                            def artiFactDtl = artiFactConfig[file]
+                            if (!artiFactDtl) {
+                                echo "No mapping defined for $file"
+                                return
+                            }
+                            def imageName = artiFactConfig[file]['quay']
+                            sh "oc set image deployment/${imageName} ${imageName}=cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/${imageName}:${params.imageVersion}-${currentBuild.number} -n cmpicp-pp"}
+                    }
+                    sh "oc logout"
+                }
+            }
+        }
+        
+        stage('InstallApplications in preprod-demo') {
+            steps {
+                script {
+                    if (!params.toOpenShift || !params.imageVersion) {
+                        echo "Skipping install Application to Openshift"
+                        return
+                    }
+
+                   // echo "Config file $config.json"
+
+                    // Always use token for cmpicp-performance
+                    def token1 = env.openshiftToken1
+
+                    sh "oc login --token=${token1} --server=${env.OPENSHIFT_SERVER}"
+
+                    dir(params.localDir) {
+                        def jarsFolders = sh(script: "find ${params.localDir} -maxdepth 1 \\( -name '*.jar' -o -type d \\) | sed 's|.*/||'", returnStdout: true).trim().split('\n')
+                        echo "Files are $jarsFolders"
+                        
+                        jarsFolders.each { file ->
+                            def artiFactDtl = artiFactConfig[file]
+                            if (!artiFactDtl) {
+                                echo "No mapping defined for $file"
+                                return
+                            }
+                            def imageName = artiFactConfig[file]['quay']
+                            sh "oc set image deployment/${imageName} ${imageName}=cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/${imageName}:${params.imageVersion}-${currentBuild.number} -n cmpicp-demo"}
+                    }
+                    sh "oc logout"
+                }
+            }
+        }
+
+        stage('Download_Tar') {
+            steps {
+                script {
+                    if (!params.Download_Tar || !params.Download_Tar) {
+                        echo "skipped Download the release tar files"
+                        return
+                    }
+                   // echo "Config file $artiFactSaveConfig"
+                    sh"podman login -u='$app' -p='QWJMUCQJTJ1M05FTRJN5OH4F0N8JBAJTX0D836G0B626Q8745RMFKV06YQP3NS2IISPUFA19FAE31PF94GIYRTX33VQWEY6K1G7AIZ3NBU1DETP8GX9GVWKO' cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in --tls-verify=false"
+                    projects.split(',').each { proj ->
+                        def artiFactDtl = artiFactSaveConfig[proj]  // Use the new config for saving images
+                        if (!artiFactDtl) {
+                            echo "No mapping defined for $proj"
+                            return
+                        }
+                   // echo "Config file $artiFactSaveConfig"
+                        def imageName = artiFactDtl['quay']
+                        def targetDirectory = '/home/IMAGE/cmpicpimage'
+                        def imageSavePath = "${targetDirectory}/${proj}.tar"
+                        sh """
+                            podman pull --tls-verify=false cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/${imageName}:PROD_READY
+                            podman save cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/${imageName}:PROD_READY  -o ${targetDirectory}/${imageName}-${currentBuild.number}.tar
+                        """
+                        sh "podman rm -a -f"
+                        sh "podman rmi -a -f"
+                    }
+                }
+            }
+        }
+
+        stage('CleanUp') {
+            steps {
+                script {
+                    if (!params.CleanUp) {
+                        echo "No cleanUp is required"
+                        return
+                    }
+                    sh """
+                        rm -rf /home/cmpdevops/CMP_PRE_PROD/*
+                        podman stop -a || true
+                        podman rm -a -f
+                        podman rmi -a -f
+                        podman volume prune -f
+                        podman system prune -a -f
+                    """
+                }
+            }
+        }
+
+    }
+}
