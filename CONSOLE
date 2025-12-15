@@ -1,0 +1,289 @@
+Started by user Jagdish Chandra 
+Obtained Jenkinsfile from git https://devops.cmpicashpro.uat.gitlab.sbi/root/cmpicp-pre-prod.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /jenkins_data/workspace/CMP_PRE_PROD
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+using credential gitlab-1
+ > git rev-parse --resolve-git-dir /jenkins_data/workspace/CMP_PRE_PROD/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://devops.cmpicashpro.uat.gitlab.sbi/root/cmpicp-pre-prod.git # timeout=10
+Fetching upstream changes from https://devops.cmpicashpro.uat.gitlab.sbi/root/cmpicp-pre-prod.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.43.7'
+using GIT_ASKPASS to set credentials gitlab-1
+ > git fetch --tags --force --progress -- https://devops.cmpicashpro.uat.gitlab.sbi/root/cmpicp-pre-prod.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 070f11daa2559ec4ffae3efa8da26bb60985bb73 (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 070f11daa2559ec4ffae3efa8da26bb60985bb73 # timeout=10
+Commit message: "Edit application.properties"
+ > git rev-list --no-walk 4a413cd699fd15f191e0a284fa041ddc4fbea57d # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (initial_cleanup)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ rm -rf '/home/cmpdevops/CMP_PRE_PROD/*'
++ podman stop -a
++ podman rm -a -f
++ podman rmi -a -f
+Untagged: cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/aurionpro-openjdk17-with-fontconfig:latest
+Deleted: b6dd42d3bd6c8e39f6bb721f2e05d4b7609dd61bcba5b5eb479562cac88c886d
++ podman volume prune -f
++ podman system prune -a -f
+Total reclaimed space: 0B
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (GetArtifactsAndUnZip)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] echo
+Selected projects are <<  >>
+[Pipeline] echo
+Projects not selected: <<>>
+[Pipeline] dir
+Running in /home/cmpdevops/CMP_PRE_PROD
+[Pipeline] {
+[Pipeline] sh
+/home/cmpdevops/CMP_PRE_PROD@tmp/durable-6139eed5/script.sh.copy: line 6: warning: here-document at line 2 delimited by end-of-file (wanted `EOF')
++ sshpass -p jenkins-sftp-password sftp -oport=2201 1023182@10.176.48.25
+
+Connected to 10.176.48.25.
+sftp>                             cd /AURION_PRO1/OUTTRAY1/Backup1/
+sftp>                             get 1_5_12Dec251352*                        
+Fetching /AURION_PRO1/OUTTRAY1/Backup1/1_5_12Dec251352CorporateDDSService.txt to 1_5_12Dec251352CorporateDDSService.txt
+Invalid command.
+sftp>                             EOF
+sftp>                         
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Unzip File)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] dir
+Running in /home/cmpdevops/CMP_PRE_PROD
+[Pipeline] {
+[Pipeline] sh
++ ls 1_5_12Dec251352CorporateDDSService.txt
+[Pipeline] sh
++ unzip -o 1_5_12Dec251352CorporateDDSService.txt
+Archive:  1_5_12Dec251352CorporateDDSService.txt
+  inflating: CorporateDDSService-0.0.1-SNAPSHOT.jar  
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (ReadConfiguration)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] readJSON
+[Pipeline] readJSON
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (BuildDockerImageAndPublish)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ podman login '-u=$app' -p=QWJMUCQJTJ1M05FTRJN5OH4F0N8JBAJTX0D836G0B626Q8745RMFKV06YQP3NS2IISPUFA19FAE31PF94GIYRTX33VQWEY6K1G7AIZ3NBU1DETP8GX9GVWKO cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in --tls-verify=false
+Login Succeeded!
+[Pipeline] sh
++ find /home/cmpdevops/CMP_PRE_PROD -maxdepth 1 '(' -name '*.jar' -o -type d ')'
++ sed 's|.*/||'
+[Pipeline] echo
+No mapping defined for CMP_PRE_PROD
+[Pipeline] echo
+dockerFile: dockerfile-corporate-dds
+[Pipeline] echo
+imageName: corporate-dds
+[Pipeline] sh
++ cp /jenkins_data/workspace/CMP_PRE_PROD/Dockerfile//dockerfile-corporate-dds /home/cmpdevops/CMP_PRE_PROD
+[Pipeline] dir
+Running in /home/cmpdevops/CMP_PRE_PROD
+[Pipeline] {
+[Pipeline] sh
++ podman build --tls-verify=false -t cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:1_5_12Dec251352-1095 -f dockerfile-corporate-dds
+STEP 1/4: FROM cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/aurionpro-openjdk17-with-fontconfig:latest
+Trying to pull cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/aurionpro-openjdk17-with-fontconfig:latest...
+Getting image source signatures
+Copying blob sha256:014ee2616e11a9c3a261f1f25861e03eca067658b5bd5be6c07f866031c30025
+Copying blob sha256:3ab17a0a83bb45a550cf9f3e9df657bcc74ef71e867dc4f17f76c9cf5aa47b7b
+Copying blob sha256:33980b37d6e076e4a267371394af444d09cdd3affc866bd89f4e0a8fc9f981e0
+Copying config sha256:7763e103df02a79d42f86eee4165c264bdbf857f91a7686317478594d2971e05
+Writing manifest to image destination
+STEP 2/4: ADD CorporateDDSService-0.0.1-SNAPSHOT.jar app.jar
+--> 6deb92e0a35d
+STEP 3/4: EXPOSE 8085
+--> ce3a9a3bf47d
+STEP 4/4: ENTRYPOINT ["java", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "app.jar"]
+COMMIT cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:1_5_12Dec251352-1095
+--> b24c479b240d
+Successfully tagged cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:1_5_12Dec251352-1095
+b24c479b240d348f2ec12b04a20d3fce94d94e9df41e66bc4d092f8fe5342479
+[Pipeline] sh
++ podman push --tls-verify=false cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:1_5_12Dec251352-1095
+Getting image source signatures
+Copying blob sha256:502f8746cbb2574512defed9a7f69d59cbb0c8b2e4bfca846df6475a25239e7a
+Copying blob sha256:00eb1d50afa9e4f428d58af1a6f88d2c7a26784bad11faf425f5a150cc94d319
+Copying blob sha256:2eade5f3330700364b7e3afb6f6c92122a9cd5dd3c4418c3faae783d3bfd89a5
+Copying blob sha256:d78d729ef617f9f5678726ef48f8e730fe4820e293441b2ff54bb838aa0192ee
+Copying config sha256:b24c479b240d348f2ec12b04a20d3fce94d94e9df41e66bc4d092f8fe5342479
+Writing manifest to image destination
+[Pipeline] sh
++ podman tag cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:1_5_12Dec251352-1095 cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:PROD_READY
+[Pipeline] sh
++ podman push --tls-verify=false cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:PROD_READY
+Getting image source signatures
+Copying blob sha256:00eb1d50afa9e4f428d58af1a6f88d2c7a26784bad11faf425f5a150cc94d319
+Copying blob sha256:d78d729ef617f9f5678726ef48f8e730fe4820e293441b2ff54bb838aa0192ee
+Copying blob sha256:502f8746cbb2574512defed9a7f69d59cbb0c8b2e4bfca846df6475a25239e7a
+Copying blob sha256:2eade5f3330700364b7e3afb6f6c92122a9cd5dd3c4418c3faae783d3bfd89a5
+Copying config sha256:b24c479b240d348f2ec12b04a20d3fce94d94e9df41e66bc4d092f8fe5342479
+Writing manifest to image destination
+[Pipeline] sh
++ podman rm -a -f
+[Pipeline] sh
++ podman rmi -a -f
+Untagged: cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/aurionpro-openjdk17-with-fontconfig:latest
+Untagged: cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:PROD_READY
+Untagged: cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:1_5_12Dec251352-1095
+Deleted: b24c479b240d348f2ec12b04a20d3fce94d94e9df41e66bc4d092f8fe5342479
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (InstallApplications)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ oc login --token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjJDYWUtODZXRzhWNGRSc3JMNlB1Q3dwMWtMajlvNDN5NzRZXzNFZlllMUkifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJjbXBpY3AtcHAiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiY21waWNwLXNlcnZpY2VhY2NvdW50LXRva2VuLXFtNno3Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImNtcGljcC1zZXJ2aWNlYWNjb3VudCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjhiNzAxOWI1LWIzMTQtNGU4Zi05NGI0LTJlYmM3MGYwZjdkMSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpjbXBpY3AtcHA6Y21waWNwLXNlcnZpY2VhY2NvdW50In0.PLa3P6BjbikhoCXvNrv1PrKQHVpgpRw1HOH-xTk3AM6l0wglv4jXO6L8u-JKQjfkPo-89ODtyqdsoQmhR09HlM2M_FwqpH-fU3-fklG83KUpajiNFpIGKW_Vb9CVfNXk0E7WvH7hyHhVRrRJv8I_GGj4xD0jd8JwQqayi7ymNvu4jqRrfGSWouiEOLWfMJ6ez57_gn0n57Fbdre0-u_vryF2ChhHcg-Xp4RoUa9tR3tT9hIy7s50S7OFuvN3EawMZnajuXxuC_lk-KRTrsJhLbAhkuqVTnaPEYRRAi51sBVy2q6idjL2TIIYVWcbUPqlx4RDpqiqQtyxksIMm7PoekP9Rps27e6qUEdP-CNay4d2vdXAO6vqhyxUKZzdhA2ikT68IQ1QwnEYW2ywTCXt_Iv8lYCPitiCCT6R34gLk9b8yicc_snKrXTIWV-5TrQuK80SGQAvx4cbSgH22iYvW0wrrdJrEWM3cdr6Gm_MuinqXXPFisCEzGo4a_0Lk4lQtN1mLSXMwgkqu6LY9DbpQOW4ERi2sts9Q88x0NhmVVsLpAXDM-_wpyvTkibTj3H2BslniLRGON3jwnwL9SDjmQ1AKe7wYjsp9COrqwrA7mpcG6PEZbFPqE2xqP7tpiY_JJvDGfA0_8KdQ8BuMdclIUrWCfmiDEpBbSIDXWLzQM8 --server=https://api.ocpcmpnonprod.sbi.co.in:6443
+WARNING: Using insecure TLS client config. Setting this option is not supported!
+
+Logged into "https://api.ocpcmpnonprod.sbi.co.in:6443" as "system:serviceaccount:cmpicp-pp:cmpicp-serviceaccount" using the token provided.
+
+You have access to the following projects and can switch between them with 'oc project <projectname>':
+
+  * cmpicp-pp
+    cmpicp-uat
+
+Using project "cmpicp-pp".
+[Pipeline] dir
+Running in /home/cmpdevops/CMP_PRE_PROD
+[Pipeline] {
+[Pipeline] sh
++ find /home/cmpdevops/CMP_PRE_PROD -maxdepth 1 '(' -name '*.jar' -o -type d ')'
++ sed 's|.*/||'
+[Pipeline] echo
+Files are [CMP_PRE_PROD, CorporateDDSService-0.0.1-SNAPSHOT.jar]
+[Pipeline] echo
+No mapping defined for CMP_PRE_PROD
+[Pipeline] sh
++ oc set image deployment/corporate-dds corporate-dds=cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:1_5_12Dec251352-1095 -n cmpicp-pp
+Warning: spec.template.spec.imagePullSecrets[1].name: duplicate name "nonprod-quay"
+deployment.apps/corporate-dds image updated
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] sh
++ oc logout
+Logged "system:serviceaccount:cmpicp-pp:cmpicp-serviceaccount" out on "https://api.ocpcmpnonprod.sbi.co.in:6443"
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (InstallApplications in preprod-demo)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ oc login --token=eyJhbGciOiJSUzI1NiIsImtpZCI6ImFZcThRUEU0b2hndG5EMUtqb09oVlZZaFFhWkRmSThpNy1PVkFkb3YteDAifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjIl0sImV4cCI6MTc5MzQyOTcwOCwiaWF0IjoxNzYxODkzNzA4LCJpc3MiOiJodHRwczovL2t1YmVybmV0ZXMuZGVmYXVsdC5zdmMiLCJrdWJlcm5ldGVzLmlvIjp7Im5hbWVzcGFjZSI6ImNtcGljcC1kZW1vIiwic2VydmljZWFjY291bnQiOnsibmFtZSI6ImNtcGljcC1zZXJ2aWNlYWNjb3VudCIsInVpZCI6IjBhODA2YzMzLTdjYzktNDA5MC05OGNlLWU3ODI1MWUwZGE4NyJ9fSwibmJmIjoxNzYxODkzNzA4LCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6Y21waWNwLWRlbW86Y21waWNwLXNlcnZpY2VhY2NvdW50In0.fRmWOszzF5hBzw5UoTW-GsFfhaw6BWdRGJtbtaaEb7rS4k4uMal76bRg6_ZWgsS_DyHHdofS5sESYaCYBaQbXBD0tY2N7iNCPtjSQEaBVOTd6dd0-ChIQUOGGfRLWorybJRDrJEGrttBrQATIVR4UXpDFzYLmtWRdh6V2wV5oqFNlbTlvcpjRKUrCjPNCj86IwTZVh8MYYSF4LwD0lYavFf9WmnVrXf6TBF_OJddTNZ8x80NQtJUi8oWogur4RGC1P4g0C-_C-HllODw3WrueLrDqNe8UZJwTMYHTsUUzVmoMLpnptT_A_CAlsmxe7lGpA6T2nw8nqCLkb1jq6Cwe-4W7vJQGhfaFo-DcJAEijt3TEwcObZ2QPay_YlbLqrWcfU-j9yFeKAlItzefnq0tU7cV17wrDsoGK9a4CWjkIum1VBeSt693F-qgcQFkE9qn_ngKxHyfzCPHkxDo_R07v4mXmlPIbUEhePSWOKzPSIEfDqDJUbVkiPpAQxRpXMC3Jvr2ptEpgpXYqITpjZwVinLpE124G23oCfM8D1QEyrIgnCM70_XeIFq0j1X7ZcdtUJZ0BkXZ-Yf4lx55egj6hNdqfX62HxMEh7yNix_dTtpK_teLuFQFvVh6YLZwhqZ88wX9nYx6JKQJ5WlGAaOBEzWmupMjoTLA-Mh3It6d1c --server=https://api.ocpcmpnonprod.sbi.co.in:6443
+WARNING: Using insecure TLS client config. Setting this option is not supported!
+
+Logged into "https://api.ocpcmpnonprod.sbi.co.in:6443" as "system:serviceaccount:cmpicp-demo:cmpicp-serviceaccount" using the token provided.
+
+You have access to 225 projects, the list has been suppressed. You can list all projects with 'oc projects'
+
+Using project "cmpicp-pp".
+[Pipeline] dir
+Running in /home/cmpdevops/CMP_PRE_PROD
+[Pipeline] {
+[Pipeline] sh
++ find /home/cmpdevops/CMP_PRE_PROD -maxdepth 1 '(' -name '*.jar' -o -type d ')'
++ sed 's|.*/||'
+[Pipeline] echo
+Files are [CMP_PRE_PROD, CorporateDDSService-0.0.1-SNAPSHOT.jar]
+[Pipeline] echo
+No mapping defined for CMP_PRE_PROD
+[Pipeline] sh
++ oc set image deployment/corporate-dds corporate-dds=cmpnonprod-registry-quay-quay-enterprise.apps.ocpcmpnonprod.sbi.co.in/cmp-icashpro-sit/corporate-dds:1_5_12Dec251352-1095 -n cmpicp-demo
+deployment.apps/corporate-dds image updated
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] sh
++ oc logout
+Logged "system:serviceaccount:cmpicp-demo:cmpicp-serviceaccount" out on "https://api.ocpcmpnonprod.sbi.co.in:6443"
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Download_Tar)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] echo
+skipped Download the release tar files
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (CleanUp)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ rm -rf /home/cmpdevops/CMP_PRE_PROD/1_5_12Dec251352CorporateDDSService.txt /home/cmpdevops/CMP_PRE_PROD/CorporateDDSService-0.0.1-SNAPSHOT.jar /home/cmpdevops/CMP_PRE_PROD/dockerfile-corporate-dds
++ podman stop -a
++ podman rm -a -f
++ podman rmi -a -f
++ podman volume prune -f
++ podman system prune -a -f
+Total reclaimed space: 0B
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
